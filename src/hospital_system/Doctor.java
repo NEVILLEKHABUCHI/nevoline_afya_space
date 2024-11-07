@@ -162,11 +162,16 @@ public class Doctor extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Patient nextPatient = patientManager.getNextPatient();
+			
 				
 				if(nextPatient != null) {
 					patientsName.setText(nextPatient.getFirstName()+" "+nextPatient.getLastName());
 				}else {
-					patientsName.setText("No more patients.");
+					
+					JOptionPane.showMessageDialog(null, "No more patients", "End of list", JOptionPane.ERROR_MESSAGE);
+					patientsName.setText("No More Patients");
+					submitButton.setEnabled(false);
+					nextButton.setEnabled(false);
 				}
 			}
 		});
@@ -175,36 +180,44 @@ public class Doctor extends JFrame{
 		submitButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String firstName = currentPatient.getFirstName();
-				String lastName = currentPatient.getLastName();
-				String dateOfBirth = currentPatient.getDateOfBirth();
-				int patientId = currentPatient.getPatientId();
-				String patientsDiagnosis = patientsDiagnosisArea.getText();
-				String patientsTreatment = patientsTreatmentArea.getText();
-				
-//				Creating a new patient object for updating patient's details in their records
-				Patient newPatient = new Patient(patientId, patientsDiagnosis, patientsTreatment);
-				
-//				Creating a new patient object for deleting a patient's details in the pending_patients table
-				Patient deletePatient = new Patient(firstName, lastName, dateOfBirth, patientId);
-				
-				if(patientManager.updatePatientsRecords(newPatient)) {
-					if(patientManager.deletePatientRecords(deletePatient)) {
-						JOptionPane.showMessageDialog(null, "Details updated Successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
-						dispose();
-						if(currentPatient != null) {
-							patientsName.setText(currentPatient.getFirstName()+" "+currentPatient.getLastName());
-						}else {
-							patientsName.setText("No patients in the queue.");
-						}
-		
-						new Doctor(patientManager);
-					}
-			
+				if(currentPatient != null) {
+//					Gather patient details for record insertion
+					String patientsDiagnosis = patientsDiagnosisArea.getText();
+					String patientsTreatment = patientsTreatmentArea.getText();
 					
+//					Update the current patient's diagnosis and treatment details
+					currentPatient.setDiagnosis(patientsDiagnosis);
+					currentPatient.setTreatment(patientsTreatment);
+					
+//					Step 1: Insert patient details into PATIENTS_RECORDS
+					if(patientManager.updatePatientsRecords(currentPatient)) {
+//						Step 2: Delete patient from PENDING_PATIENTS if the insertion was successful
+						if(patientManager.deletePatientRecords(currentPatient)) {
+							JOptionPane.showMessageDialog(null, "Patient Details Updated Successfully", "Update Successful", JOptionPane.INFORMATION_MESSAGE);
+							
+//							Remove the current patient and move to the next 
+							patientManager.removeCurrentPatient();
+							currentPatient = patientManager.getNextPatient();
+							
+							displayCurrentPatient();
+							
+							if(currentPatient != null) {
+								patientsName.setText(currentPatient.getFirstName()+" "+currentPatient.getLastName());
+								patientsDiagnosisArea.setText(" ");
+								patientsTreatmentArea.setText(" ");
+							}else {
+								patientsName.setText("No Patients in the queue.");
+							}
+						}else {
+							JOptionPane.showMessageDialog(null, "Error removing the patient from PENDING_PATIENTS table","Deletion Error", JOptionPane.ERROR_MESSAGE);
+						}
+					}else {
+						JOptionPane.showMessageDialog(null, "An error occurred while updating the records", "Update Error", JOptionPane.ERROR_MESSAGE);
+					}
 				}else {
-					JOptionPane.showMessageDialog(null, "An error occurred while sending the details to the database", "Error while updating the records", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null,  "No Patient selected", "Error", JOptionPane.ERROR_MESSAGE);
 				}
+				
 			}
 		});
 		
@@ -221,11 +234,33 @@ public class Doctor extends JFrame{
 		 CardLayout cardLayout = (CardLayout) (bodyPanel.getLayout());
 //	     cardLayout.show(bodyPanel, "Card1"); // Ensures first card displays
 
-	     patientsTab.addActionListener(e -> cardLayout.show(bodyPanel, "Patients"));
+	     patientsTab.addActionListener(new ActionListener() {
+	    	 @Override
+	    	 public void actionPerformed(ActionEvent e) {
+	    		 cardLayout.show(bodyPanel, "Patients");
+	    		 patientManager.resetQueue();
+	    		 dispose();
+	    		 new Doctor(patientManager);
+	    	 }
+	     });
 	     appointmentsTab.addActionListener(e -> cardLayout.show(bodyPanel, "Appointments"));
 		
 		setLocationRelativeTo(null);
 		 setVisible(true);
+	}
+	
+//	Method to display the current patient's details in the UI
+	private void displayCurrentPatient() {
+		if (currentPatient != null) {
+			patientsName.setText(currentPatient.getFirstName()+ " "+currentPatient.getLastName());
+			patientsDiagnosisArea.setText(" ");
+			patientsTreatmentArea.setText(" ");
+			
+		}else {
+			patientsName.setText("No patients in the queue");
+			patientsDiagnosisArea.setText(" " );
+			patientsTreatmentArea.setText(" ");
+		}
 	}
 
 }

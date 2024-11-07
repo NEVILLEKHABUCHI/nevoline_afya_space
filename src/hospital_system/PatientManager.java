@@ -182,7 +182,7 @@ public class PatientManager {
 		
 //		Method to handle the next patient's details
 		public Patient getNextPatient() {
-			if(currentIndex + 1 < pendingPatients.size()) {
+			if(currentIndex +1 < pendingPatients.size()) {
 				currentIndex++;
 				return pendingPatients.get(currentIndex);
 			}
@@ -190,7 +190,15 @@ public class PatientManager {
 		}
 		
 		public boolean hasNext() {
-			return currentIndex + 1 < pendingPatients.size();
+			return currentIndex +1< pendingPatients.size();
+		}
+		
+//		Method to remove the current patient after successful submission
+		public void removeCurrentPatient() {
+			if(currentIndex > 0) {
+				pendingPatients.remove(currentIndex - 1);
+				currentIndex--; //Adjust index after removal
+			}
 		}
 		
 //		Method to update patient's details in the patients_records table in the database
@@ -212,7 +220,7 @@ public class PatientManager {
 			}
 		}
 		
-//		Method to delete patient's details in the pending_patients table after the patient's details being successfully sent to patients_history tabel
+//		Method to delete patient's details in the pending_patients table after the patient's details being successfully sent to patients_history table
 		public boolean deletePatientRecords(Patient patient) {
 			String query = "DELETE FROM PENDING_PATIENTS WHERE PATIENT_ID = ?";
 			
@@ -221,9 +229,6 @@ public class PatientManager {
 				pstmt .setInt(1, patient.getPatientId());
 				pstmt.executeUpdate();
 				
-//				Remove patient from the local list as well
-				pendingPatients.remove(patient);
-				
 				return true;  //Record deleted successfully
 			}catch(SQLException e) {
 				e.printStackTrace();
@@ -231,6 +236,10 @@ public class PatientManager {
 			}
 		}
 		
-//		Method to delete patient's details from the pending_patients table and tr
+//		Method to reset to start at the first patient in the list
+		public void resetQueue() {
+			currentIndex = 0;
+		}
+//		
 
 }
