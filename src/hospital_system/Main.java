@@ -6,6 +6,7 @@ public class Main {
 		// TODO Auto-generated method stub
 		UserManager userManager = new UserManager(); //Create an instance of UserManager
 		new Signup(userManager); //Start with the signup window
+//		new History();
 
 	}
 

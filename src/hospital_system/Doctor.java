@@ -18,6 +18,7 @@ public class Doctor extends JFrame{
 		this.patientManager = patientManager;
 		createDoctorsWindow();
 	}
+
 	private void createDoctorsWindow() {
 		setTitle("Nevoline Afya Space");
 		setSize(400, 700);
@@ -88,6 +89,8 @@ public class Doctor extends JFrame{
 		gbc.insets = new Insets(10, 0, 1, 10);
 		patientsPanel.add(historyButton, gbc);
 		
+//	
+//		
 //		Creating a JLabel and JTextArea for paient's diagnosis
 		JLabel patientsDiagnosis = new JLabel("Enter the Patient's Diagnosis: ");
 		gbc.gridx = 0;
@@ -162,10 +165,12 @@ public class Doctor extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Patient nextPatient = patientManager.getNextPatient();
-			
+				
 				
 				if(nextPatient != null) {
+					currentPatient = nextPatient; //Update the current patient references
 					patientsName.setText(nextPatient.getFirstName()+" "+nextPatient.getLastName());
+			
 				}else {
 					
 					JOptionPane.showMessageDialog(null, "No more patients", "End of list", JOptionPane.ERROR_MESSAGE);
@@ -173,6 +178,17 @@ public class Doctor extends JFrame{
 					submitButton.setEnabled(false);
 					nextButton.setEnabled(false);
 				}
+			}
+		});
+		
+//		Adding an action on the historyButton
+		historyButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new History(currentPatient.getFirstName()+" "+currentPatient.getLastName(), patientManager);
+				
+//				Call the showPatientHistory method in patientManager to fetch patient history
+				patientManager.showPatientHistory(currentPatient);
 			}
 		});
 		
@@ -220,7 +236,7 @@ public class Doctor extends JFrame{
 				
 			}
 		});
-		
+	
 		 JPanel appointmentsPanel = new JPanel();
 		 appointmentsPanel.add(new JLabel("This is the appointments JPanel")); 
 		 
@@ -262,5 +278,7 @@ public class Doctor extends JFrame{
 			patientsTreatmentArea.setText(" ");
 		}
 	}
+	
+
 
 }

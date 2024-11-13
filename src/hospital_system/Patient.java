@@ -1,5 +1,7 @@
 package hospital_system;
 
+import java.sql.Timestamp;
+
 public class Patient extends Person{
 	private int patientId;
 	private String dateOfBirth;
@@ -8,6 +10,7 @@ public class Patient extends Person{
 	private int kinsPhoneNumber;
 	private String diagnosis;
 	private String treatment;
+	private Timestamp dateCreated;
 	
 //	Default Constructor
 	public Patient() {}
@@ -29,16 +32,18 @@ public class Patient extends Person{
 	}
 	
 //	Overriding constructor
-//	public Patient(String firstName, String lastName, int patientId) {
-//		super(firstName, lastName);
-//		this.patientId = patientId;
-//	}
-	
-//	Overriding constructor
 	public Patient(int patientId, String diagnosis, String treatment) {
 		this.patientId = patientId;
 		this.diagnosis = diagnosis;
 		this.treatment = treatment;
+	}
+	
+//	Overriding constructor
+	public Patient(String dateOfBirth, String diagnosis, String treatment, Timestamp dateCreated) {
+		this.dateOfBirth = dateOfBirth;
+		this.diagnosis = diagnosis;
+		this.treatment = treatment;
+		this.dateCreated = dateCreated;
 	}
 	
 //	Getter and Setter methods for the Patient class
@@ -80,5 +85,9 @@ public class Patient extends Person{
 	}
 	public void setTreatment(String treatment) {
 		this.treatment = treatment;
+	}
+	
+	public Timestamp getDateCreated() {
+		return dateCreated;
 	}
 }

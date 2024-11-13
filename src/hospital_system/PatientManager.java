@@ -2,17 +2,19 @@ package hospital_system;
 
 import javax.swing.*;
 import java.sql.*;
+import java.sql.Date;
 import java.util.*;
 
 public class PatientManager {
 	private Connection connection;
-	private List<Patient> patientCache, pendingPatients;
+	private List<Patient> patientCache, pendingPatients, patientsHistory;
 	private int currentIndex;
 	
 	public PatientManager() {
 		connection = new DatabaseConnection().getConnection();
 		patientCache = new ArrayList<>();
 		pendingPatients = new ArrayList<>();
+		patientsHistory = new ArrayList<>();
 		currentIndex = 0;
 		loadPatients();
 		loadPendingPatients();
@@ -240,6 +242,45 @@ public class PatientManager {
 		public void resetQueue() {
 			currentIndex = 0;
 		}
-//		
+
+		
+		public void showPatientHistory(Patient patient) {
+			
+			String query = "SELECT FIRST_NAME, LAST_NAME, DATE_OF_BIRTH, DIAGNOSIS, TREATMENT, DATE_CREATED " +
+		               "FROM PATIENTS " +
+		               "INNER JOIN PATIENTS_RECORDS ON PATIENTS.PATIENT_ID = PATIENTS_RECORDS.PATIENT_ID " +
+		               "WHERE PATIENTS.PATIENT_ID = ?";
+
+			try(PreparedStatement pstmt = connection.prepareStatement(query)){
+				pstmt.setInt(1, patient.getPatientId());
+				
+				ResultSet resultSet = pstmt.executeQuery();
+				
+//				Process the result set to show patient history
+				if(!resultSet.isBeforeFirst()) {
+					JOptionPane.showMessageDialog(null, "No existing records for the patient.", "No History", JOptionPane.INFORMATION_MESSAGE);
+				}else {
+					System.out.println("History for patient "+patient.getFirstName()+" "+patient.getLastName());
+					while(resultSet.next()) {
+//						String firstName = resultSet.getString("FIRST_NAME");
+//						String lastName = resultSet.getString("LAST_NAME");
+						String dateOfBirth = resultSet.getString("DATE_OF_BIRTH");
+						String diagnosis = resultSet.getString("DIAGNOSIS");
+						String treatment = resultSet.getString("TREATMENT");
+						Timestamp dateCreated = resultSet.getTimestamp("DATE_CREATED");
+						
+						patientsHistory.add(new Patient(dateOfBirth, diagnosis, treatment, dateCreated ));
+						System.out.println(patientsHistory);
+					}
+				}
+			}catch(SQLException e) {
+				e.printStackTrace();
+				System.out.println("Error retrieving patient historyr: "+e.getMessage());
+			}
+		}
+		
+		public List<Patient> getAllRecords(){
+			return patientsHistory;
+		}
 
 }
