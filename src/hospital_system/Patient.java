@@ -39,7 +39,7 @@ public class Patient extends Person{
 	}
 	
 //	Overriding constructor
-	public Patient(String dateOfBirth, String diagnosis, String treatment, Timestamp dateCreated) {
+	public Patient( String dateOfBirth, String diagnosis, String treatment, Timestamp dateCreated) {
 		this.dateOfBirth = dateOfBirth;
 		this.diagnosis = diagnosis;
 		this.treatment = treatment;
@@ -90,4 +90,14 @@ public class Patient extends Person{
 	public Timestamp getDateCreated() {
 		return dateCreated;
 	}
+	
+//	@Override
+//	public String toString() {
+//		return "Patient{"+
+//				"dateOfBirth= '" + dateOfBirth + '\''+
+//				", diagnosis= '" + diagnosis + '\''+
+//				", treatment = '" + treatment + '\''+
+//				", dateCreated = '" + dateCreated + '\''+
+//				'}';
+//	}
 }

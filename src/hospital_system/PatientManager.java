@@ -244,39 +244,46 @@ public class PatientManager {
 		}
 
 		
-		public void showPatientHistory(Patient patient) {
+		public boolean showPatientHistory(Patient currentPatient) {
 			
-			String query = "SELECT FIRST_NAME, LAST_NAME, DATE_OF_BIRTH, DIAGNOSIS, TREATMENT, DATE_CREATED " +
+			patientsHistory.clear();
+			
+			String query = "SELECT DATE_OF_BIRTH, DIAGNOSIS, TREATMENT, DATE_CREATED " +
 		               "FROM PATIENTS " +
 		               "INNER JOIN PATIENTS_RECORDS ON PATIENTS.PATIENT_ID = PATIENTS_RECORDS.PATIENT_ID " +
 		               "WHERE PATIENTS.PATIENT_ID = ?";
 
 			try(PreparedStatement pstmt = connection.prepareStatement(query)){
-				pstmt.setInt(1, patient.getPatientId());
+				pstmt.setInt(1, currentPatient.getPatientId());
 				
 				ResultSet resultSet = pstmt.executeQuery();
 				
 //				Process the result set to show patient history
 				if(!resultSet.isBeforeFirst()) {
-					JOptionPane.showMessageDialog(null, "No existing records for the patient.", "No History", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(null, "No existing records for the patient.it is the patient's first time to visit Nevoline", "No History", JOptionPane.INFORMATION_MESSAGE);
+					return false;
 				}else {
-					System.out.println("History for patient "+patient.getFirstName()+" "+patient.getLastName());
 					while(resultSet.next()) {
 //						String firstName = resultSet.getString("FIRST_NAME");
-//						String lastName = resultSet.getString("LAST_NAME");
+//						String lastName = resultSet.getString("LAST_NAME")
 						String dateOfBirth = resultSet.getString("DATE_OF_BIRTH");
 						String diagnosis = resultSet.getString("DIAGNOSIS");
 						String treatment = resultSet.getString("TREATMENT");
 						Timestamp dateCreated = resultSet.getTimestamp("DATE_CREATED");
 						
 						patientsHistory.add(new Patient(dateOfBirth, diagnosis, treatment, dateCreated ));
-						System.out.println(patientsHistory);
+//						
+//						for (Patient patient1 : patientsHistory) {
+//							System.out.println(patient1);
+//						}
 					}
+					return true; //Records found and added to the history
 				}
 			}catch(SQLException e) {
 				e.printStackTrace();
 				System.out.println("Error retrieving patient historyr: "+e.getMessage());
 			}
+			return false;
 		}
 		
 		public List<Patient> getAllRecords(){

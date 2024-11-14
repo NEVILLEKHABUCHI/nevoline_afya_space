@@ -24,7 +24,7 @@ public class History extends JFrame{
 	
 	private void createHistoryWindow() {
 		setTitle("Nevoline Afya Space");
-		setSize(400,700);
+		setSize(700,900);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLayout(new BorderLayout());
 		
@@ -49,7 +49,7 @@ public class History extends JFrame{
 		GridBagConstraints gbc = new GridBagConstraints();
 		
 //		Creating a JLabel for the patient's name
-		JLabel patientsName = new JLabel("PATIENT'S NAME"+patientName);
+		JLabel patientsName = new JLabel("PATIENT'S NAME: "+patientName);
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridwidth = 1;
@@ -102,9 +102,6 @@ public class History extends JFrame{
 	private void displayHistory(List<Patient> records) {
 		historyTableModel.setRowCount(0); //Clear previous results
 		
-		if(records.isEmpty()) {
-			JOptionPane.showMessageDialog(null, "No history for this patient. It's their first.", "No History", JOptionPane.INFORMATION_MESSAGE);
-		}else {
 			for (Patient record: records) {
 				historyTableModel.addRow(new Object[] {
 						record.getDateOfBirth(),
@@ -113,7 +110,6 @@ public class History extends JFrame{
 						record.getDateCreated()
 				});
 			}
-		}
-	
+		
 	}
 }

@@ -175,6 +175,7 @@ public class Doctor extends JFrame{
 					
 					JOptionPane.showMessageDialog(null, "No more patients", "End of list", JOptionPane.ERROR_MESSAGE);
 					patientsName.setText("No More Patients");
+					historyButton.setEnabled(false);
 					submitButton.setEnabled(false);
 					nextButton.setEnabled(false);
 				}
@@ -185,10 +186,13 @@ public class Doctor extends JFrame{
 		historyButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new History(currentPatient.getFirstName()+" "+currentPatient.getLastName(), patientManager);
+				boolean hasHistory = patientManager.showPatientHistory(currentPatient);
 				
-//				Call the showPatientHistory method in patientManager to fetch patient history
-				patientManager.showPatientHistory(currentPatient);
+				if (hasHistory) {
+					new History(currentPatient.getFirstName()+" "+currentPatient.getLastName(), patientManager);
+				}else {
+					JOptionPane.showMessageDialog(null, "No existing records for the patient.", "No History", JOptionPane.INFORMATION_MESSAGE);
+				}
 			}
 		});
 		
